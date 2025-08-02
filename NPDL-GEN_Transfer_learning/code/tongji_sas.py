@@ -1,0 +1,52 @@
+# coding:latin-1
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.rcParams.update({
+    'font.family': 'Times New Roman',
+    'font.size': 8,  # 设置全局字体大小为8
+    'axes.linewidth': 1.0,
+    'axes.labelsize': 8,  # 坐标轴标签字体大小
+    'axes.titlesize': 8,  # 标题字体大小
+    'xtick.labelsize': 8,  # x轴刻度字体大小
+    'ytick.labelsize': 8,  # y轴刻度字体大小
+    'lines.linewidth': 1.5,
+    'lines.markersize': 6,
+    'legend.fontsize': 8,  # 图例字体大小
+    'legend.frameon': True,
+    'legend.edgecolor': 'black'
+})
+
+# 读取CSV文件
+df = pd.read_csv("autodl-tmp/code_final/gpt1_ahc_400_topk_0.25_diversity_generation_10000_unique_with_scaffold_3000_property.csv")
+
+# 将sas列分组
+bins = [1, 2, 3, 4, 5, 6, 7, 8]
+labels = ['1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8']
+df['sas_group'] = pd.cut(df['sas'], bins=bins, labels=labels, right=False)
+
+# 统计每个分组的数量
+sas_counts = df['sas_group'].value_counts().sort_index()
+
+# 创建绘图
+plt.figure(figsize=(12/2.54, 7/2.54))
+
+
+ax = sns.barplot(x=sas_counts.index, y=sas_counts.values, palette="coolwarm", edgecolor="black")
+
+# 美化细节
+for bar in ax.patches:
+    bar.set_width(0.7)
+for container in ax.containers:
+    ax.bar_label(container, fmt='%d', fontsize=8, padding=5)  # 显示柱状图上的数据标签
+
+
+plt.xlabel("SAS", fontsize=8)
+plt.ylabel("Count", fontsize=8)
+plt.xticks(fontsize=8)
+plt.yticks(ticks=range(0,901,100), fontsize=8)
+
+
+plt.savefig("autodl-tmp/code_final/tongji_sas_after_414.svg",dpi=300, bbox_inches='tight', pad_inches=0)
+

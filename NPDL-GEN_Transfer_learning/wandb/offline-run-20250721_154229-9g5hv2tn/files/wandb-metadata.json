@@ -1,0 +1,46 @@
+{
+  "os": "Linux-5.15.0-101-generic-x86_64-with-glibc2.17",
+  "python": "CPython 3.8.10",
+  "startedAt": "2025-07-21T07:42:29.478156Z",
+  "args": [
+    "--run_name",
+    "pretrain-8-layer-12",
+    "--batch_size",
+    "64",
+    "--max_epochs",
+    "8"
+  ],
+  "program": "train/train.py",
+  "codePath": "train/train.py",
+  "root": "/root/autodl-tmp/code_final",
+  "host": "autodl-container-75ca4f8174-d9826972",
+  "executable": "/root/miniconda3/bin/python",
+  "codePathLocal": "train/train.py",
+  "cpu_count": 128,
+  "cpu_count_logical": 256,
+  "gpu": "NVIDIA GeForce RTX 4090 D",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "32212254720",
+      "used": "706478080"
+    }
+  },
+  "memory": {
+    "total": "810851426304"
+  },
+  "cpu": {
+    "count": 128,
+    "countLogical": 256
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 4090 D",
+      "memoryTotal": "25757220864",
+      "cudaCores": 14592,
+      "architecture": "Ada",
+      "uuid": "GPU-8565aae2-4a5c-81ae-2698-62db43f181f1"
+    }
+  ],
+  "cudaVersion": "12.4"
+}

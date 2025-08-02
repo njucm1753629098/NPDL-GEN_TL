@@ -1,0 +1,15 @@
+{"time":"2025-07-21T15:44:08.928823247+08:00","level":"INFO","msg":"stream: starting","core version":"0.20.1","symlink path":"/root/autodl-tmp/code_final/wandb/offline-run-20250721_154408-yytyi327/logs/debug-core.log"}
+{"time":"2025-07-21T15:44:09.035261888+08:00","level":"WARN","msg":"GraphQL client is nil, skipping feature loading"}
+{"time":"2025-07-21T15:44:09.035437555+08:00","level":"INFO","msg":"stream: created new stream","id":"yytyi327"}
+{"time":"2025-07-21T15:44:09.035462706+08:00","level":"INFO","msg":"stream: started","id":"yytyi327"}
+{"time":"2025-07-21T15:44:09.035498937+08:00","level":"INFO","msg":"writer: Do: started","stream_id":"yytyi327"}
+{"time":"2025-07-21T15:44:09.035524098+08:00","level":"INFO","msg":"sender: started","stream_id":"yytyi327"}
+{"time":"2025-07-21T15:44:09.035634483+08:00","level":"INFO","msg":"handler: started","stream_id":"yytyi327"}
+{"time":"2025-07-21T15:44:09.040896005+08:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-07-21T15:48:22.757828602+08:00","level":"INFO","msg":"stream: closing","id":"yytyi327"}
+{"time":"2025-07-21T15:48:22.757890974+08:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-07-21T15:48:22.757960805+08:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-07-21T15:48:22.758056227+08:00","level":"INFO","msg":"handler: closed","stream_id":"yytyi327"}
+{"time":"2025-07-21T15:48:22.758065818+08:00","level":"INFO","msg":"writer: Close: closed","stream_id":"yytyi327"}
+{"time":"2025-07-21T15:48:22.758085498+08:00","level":"INFO","msg":"sender: closed","stream_id":"yytyi327"}
+{"time":"2025-07-21T15:48:22.758243472+08:00","level":"INFO","msg":"stream: closed","id":"yytyi327"}
