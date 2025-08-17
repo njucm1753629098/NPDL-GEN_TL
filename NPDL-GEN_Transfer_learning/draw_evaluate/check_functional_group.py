@@ -1,0 +1,306 @@
+# coding:latin-1
+ 
+
+'''
+import csv
+from rdkit import Chem
+import pandas as pd
+import matplotlib.pyplot as plt
+from collections import Counter
+
+# 读取功能基 SMARTS 和 SMILES 数据
+def read_data(smarts_file, smiles_file):
+    with open(smarts_file, "r") as f:
+        functional_groups = [line.strip() for line in f if line.strip()]
+    
+    with open(smiles_file, "r") as f:
+        smiles_list = [line.strip() for line in f if line.strip()]
+    
+    return functional_groups, smiles_list
+
+# 匹配功能基并返回结果
+def match_functional_groups(smiles_list, functional_groups):
+    output_rows = []
+    functional_group_count = Counter()
+    
+    for smiles in smiles_list:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            matched_groups = [smarts for smarts in functional_groups if Chem.MolFromSmarts(smarts) and mol.HasSubstructMatch(Chem.MolFromSmarts(smarts))]
+            for group in matched_groups:
+                functional_group_count[group] += 1
+            output_rows.append([smiles, ", ".join(matched_groups) if matched_groups else "None"])
+        else:
+            output_rows.append([smiles, "Invalid SMILES"])
+    
+    return output_rows, functional_group_count
+
+# 保存 CSV 文件
+def save_csv(file_path, data, headers):
+    with open(file_path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(headers)
+        writer.writerows(data)
+
+# 绘制柱状图
+def plot_bar_chart(df):
+    plt.style.use('default')
+    plt.rcParams.update({
+        'font.family': 'Times New Roman',
+        'font.size': 8,  # 设置全局字体大小为8
+        'axes.linewidth': 1.0,
+        'axes.labelsize': 8,  # 坐标轴标签字体大小
+        'axes.titlesize': 8,  # 标题字体大小
+        'xtick.labelsize': 8,  # x轴刻度字体大小
+        'ytick.labelsize': 8,  # y轴刻度字体大小
+        'lines.linewidth': 1.5,
+        'lines.markersize': 6,
+        'legend.fontsize': 8,  # 图例字体大小
+        'legend.frameon': True,
+        'legend.edgecolor': 'black'
+    })
+
+    # 计算Ratio
+    df['Ratio'] = df['Count'] / 3000
+
+    # 创建图形
+    fig, ax = plt.subplots(figsize=(3, 2.7), dpi=300)  # 调整为更适合期刊的尺寸
+
+    # 绘制柱状图
+    bars = ax.bar(df['Name'], df['Ratio'],
+                  color='#4472C4',     # 使用更专业的蓝色
+                  edgecolor='black',
+                  linewidth=0.8,
+                  width=0.7)           # 调整柱子宽度
+
+    # 添加数值标签
+    for bar in bars:
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height,
+                f'{height:.2f}',
+                ha='center', va='bottom',
+                fontsize=8)  # 字体大小调整为8
+
+    # 设置轴标签
+    ax.set_ylabel('Ratio', fontsize=8)
+
+    # 设置y轴范围和格式
+    ax.set_ylim(0, 1.1)  # 给数值标签留出空间
+    ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.2f'))
+    ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    # 调整x轴标签
+    plt.xticks(rotation=45, ha='right')
+    ax.set_xticklabels(df['Name'], fontsize=8)
+
+    # 去除网格线
+    ax.yaxis.grid(False)
+    ax.xaxis.grid(False)
+
+    # 调整边框
+    for spine in ax.spines.values():
+        spine.set_linewidth(1.0)
+        spine.set_color('black')
+
+    # 调整布局
+    plt.tight_layout()
+
+    # 保存图片
+    plt.savefig('autodl-tmp/code_final/functional_group_ratios_gpt1_second.svg',
+                dpi=300,
+                bbox_inches='tight',
+                pad_inches=0)
+
+    plt.close()
+
+# 主函数
+def main():
+    functional_groups, smiles_list = read_data("autodl-tmp/code_final/functional.txt", "autodl-tmp/code_final/gpt1_ahc_3000.txt")
+    
+    # 匹配功能基并保存结果
+    output_rows, functional_group_count = match_functional_groups(smiles_list, functional_groups)
+    save_csv("autodl-tmp/code_final/molecule_functional_gpt1.csv", output_rows, ["SMILES", "Functional Groups"])
+
+    # 保存功能团出现次数
+    stats_file = "autodl-tmp/code_final/functional_group_statistics_gpt1.csv"
+    save_csv(stats_file, [[group, count] for group, count in functional_group_count.items()], ["Functional Group", "Count"])
+
+    # 读取功能团统计数据并排序
+    stats_df = pd.read_csv(stats_file)
+    sorted_stats_df = stats_df.sort_values(by='Count', ascending=False).head(8)
+    
+    # 读取功能基 Notes 映射
+    functional_groups_df = pd.read_csv("autodl-tmp/code_final/FunctionalGroups.csv")
+    smarts_to_notes = dict(zip(functional_groups_df['SMARTS'], functional_groups_df['Notes']))
+
+    # 根据 SMARTS 获取 Notes
+    sorted_stats_df['Name'] = sorted_stats_df['Functional Group'].apply(lambda x: smarts_to_notes.get(x, 'Unknown'))
+
+    # 保存最终结果
+    sorted_stats_df.to_csv("autodl-tmp/code_final/sorted_functional_group_statistics_gpt1.csv", index=False)
+
+    # 绘制并保存柱状图
+    plot_bar_chart(sorted_stats_df)
+
+    # 打印统计信息
+    print(f"Total number of functional groups: {len(sorted_stats_df)}")
+    print(f"Maximum ratio: {sorted_stats_df['Ratio'].max():.3f}")
+    print(f"Average ratio: {sorted_stats_df['Ratio'].mean():.3f}")
+
+if __name__ == "__main__":
+    main()
+
+'''
+import csv
+from rdkit import Chem
+import pandas as pd
+import matplotlib.pyplot as plt
+from collections import Counter
+
+# 读取功能基 SMARTS 和 SMILES 数据
+def read_data(smarts_file, smiles_file):
+    with open(smarts_file, "r") as f:
+        functional_groups = [line.strip() for line in f if line.strip()]
+    
+    with open(smiles_file, "r") as f:
+        smiles_list = [line.strip() for line in f if line.strip()]
+    
+    return functional_groups, smiles_list
+
+# 匹配功能基并返回结果
+def match_functional_groups(smiles_list, functional_groups):
+    output_rows = []
+    functional_group_count = Counter()
+    
+    for smiles in smiles_list:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol:
+            matched_groups = [smarts for smarts in functional_groups if Chem.MolFromSmarts(smarts) and mol.HasSubstructMatch(Chem.MolFromSmarts(smarts))]
+            for group in matched_groups:
+                functional_group_count[group] += 1
+            output_rows.append([smiles, ", ".join(matched_groups) if matched_groups else "None"])
+        else:
+            output_rows.append([smiles, "Invalid SMILES"])
+    
+    return output_rows, functional_group_count
+
+# 保存 CSV 文件
+def save_csv(file_path, data, headers):
+    with open(file_path, "w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(headers)
+        writer.writerows(data)
+
+# 绘制柱状图
+def plot_bar_chart(df):
+    plt.style.use('default')
+    plt.rcParams.update({
+        'font.family': 'Times New Roman',
+        'font.size': 8,  # 设置全局字体大小为8
+        'axes.linewidth': 1.0,
+        'axes.labelsize': 8,  # 坐标轴标签字体大小
+        'axes.titlesize': 8,  # 标题字体大小
+        'xtick.labelsize': 8,  # x轴刻度字体大小
+        'ytick.labelsize': 8,  # y轴刻度字体大小
+        'lines.linewidth': 1.5,
+        'lines.markersize': 6,
+        'legend.fontsize': 8,  # 图例字体大小
+        'legend.frameon': True,
+        'legend.edgecolor': 'black'
+    })
+
+    # 计算Ratio
+    df['Ratio'] = df['Count'] / 3000
+
+    # 创建图形
+    fig, ax = plt.subplots(figsize=(3, 2.7), dpi=300)  # 调整为更适合期刊的尺寸
+
+    # 绘制柱状图
+    bars = ax.bar(df['Name'], df['Ratio'],
+                  color='#4472C4',     # 使用更专业的蓝色
+                  edgecolor='black',
+                  linewidth=0.8,
+                  width=0.7)           # 调整柱子宽度
+
+    # 添加数值标签
+    for bar in bars:
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height,
+                f'{height:.2f}',
+                ha='center', va='bottom',
+                fontsize=8)  # 字体大小调整为8
+
+    # 设置轴标签
+    ax.set_ylabel('Ratio', fontsize=8)
+
+    # 设置y轴范围和格式
+    ax.set_ylim(0, 1.1)  # 给数值标签留出空间
+    ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.2f'))
+    ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    # 调整x轴标签
+    plt.xticks(rotation=45, ha='right')
+    ax.set_xticklabels(df['Name'], fontsize=8)
+
+    # 去除网格线
+    ax.yaxis.grid(False)
+    ax.xaxis.grid(False)
+
+    # 调整边框
+    for spine in ax.spines.values():
+        spine.set_linewidth(1.0)
+        spine.set_color('black')
+
+    # 调整布局
+    plt.tight_layout()
+
+    # 保存图片
+    plt.savefig('autodl-tmp/code_final/functional_group_ratios_trainset_second.svg',
+                dpi=300,
+                bbox_inches='tight',
+                pad_inches=0)
+
+    plt.close()
+
+# 主函数
+def main():
+    functional_groups, smiles_list = read_data("autodl-tmp/code_final/functional.txt", "autodl-tmp/code_final/datasets/zuhe/train_merged_smiles_with_property_scaffold_3000.txt")
+    
+    # 匹配功能基并保存结果
+    output_rows, functional_group_count = match_functional_groups(smiles_list, functional_groups)
+    save_csv("autodl-tmp/code_final/molecule_functional_trainset.csv", output_rows, ["SMILES", "Functional Groups"])
+
+    # 保存功能团出现次数
+    stats_file = "autodl-tmp/code_final/functional_group_statistics_trainset.csv"
+    save_csv(stats_file, [[group, count] for group, count in functional_group_count.items()], ["Functional Group", "Count"])
+
+    # 读取功能团统计数据并排序
+    stats_df = pd.read_csv(stats_file)
+    sorted_stats_df = stats_df.sort_values(by='Count', ascending=False).head(8)
+    
+    # 读取功能基 Notes 映射
+    functional_groups_df = pd.read_csv("autodl-tmp/code_final/FunctionalGroups.csv")
+    smarts_to_notes = dict(zip(functional_groups_df['SMARTS'], functional_groups_df['Notes']))
+
+    # 根据 SMARTS 获取 Notes
+    sorted_stats_df['Name'] = sorted_stats_df['Functional Group'].apply(lambda x: smarts_to_notes.get(x, 'Unknown'))
+
+    # 保存最终结果
+    sorted_stats_df.to_csv("autodl-tmp/code_final/sorted_functional_group_statistics_trainset.csv", index=False)
+
+    # 绘制并保存柱状图
+    plot_bar_chart(sorted_stats_df)
+
+    # 打印统计信息
+    print(f"Total number of functional groups: {len(sorted_stats_df)}")
+    print(f"Maximum ratio: {sorted_stats_df['Ratio'].max():.3f}")
+    print(f"Average ratio: {sorted_stats_df['Ratio'].mean():.3f}")
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+

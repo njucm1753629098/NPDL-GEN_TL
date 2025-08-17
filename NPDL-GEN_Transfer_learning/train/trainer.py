@@ -165,7 +165,7 @@ class Trainer:
             prior_likelihoood = - prior_likelihood
             print("The size of prior_likelihood:",prior_likelihood.size())
             
-            filename = f"NPDL-GEN&Transfer_learning/score_results/iterations_ahc_gpt1_400_topk_0.25/step_{step}.csv"
+            filename = f"NPDL-GEN_Transfer_learning/score_results/iterations_ahc_gpt1_400_topk_0.25/step_{step}.csv"
             with open(filename, mode='w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(['step_id', 'smiles', 'valid', 'qed'])  
@@ -319,7 +319,7 @@ class Trainer:
             prior_likelihoood = - prior_likelihood
             print("The size of prior_likelihood:",prior_likelihood.size())
             
-            filename = f"NPDL-GEN&Transfer_learning/score_results/iterations_reinvent_gpt1_400/step_{step}.csv"
+            filename = f"NPDL-GEN_Transfer_learning/score_results/iterations_reinvent_gpt1_400/step_{step}.csv"
             with open(filename, mode='w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(['step_id', 'smiles', 'valid', 'qed'])  
@@ -388,7 +388,7 @@ class Trainer:
                 if Chem.MolFromSmiles(completion) is not None:  
                     valid_smiles.append(completion)
             agent_likelihood = - agent_likelihood
-            filename = f"NPDL-GEN&Transfer_learning/score_results/iterations_reinforce_gpt1_400/step_{step}.csv"
+            filename = f"NPDL-GEN_Transfer_learning/score_results/iterations_reinforce_gpt1_400/step_{step}.csv"
             with open(filename, mode='w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(['step_id', 'smiles', 'valid', 'qed'])  

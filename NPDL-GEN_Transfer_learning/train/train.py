@@ -45,26 +45,26 @@ if __name__ == '__main__':
     set_seed(42)
     wandb.init(project="code_final", name=args.run_name)
  
-    with open('NPDL-GEN&Transfer_learning/datasets/merged_smiles_after.txt','r') as file:
+    with open('NPDL-GEN_Transfer_learning/datasets/merged_smiles_after.txt','r') as file:
         smiles_list = file.readlines()
     smiles_list = [smiles.strip() for smiles in smiles_list]
 
     train_smiles, test_smiles = train_test_split(smiles_list, test_size=0.3, random_state=42)
 
-    with open('NPDL-GEN&Transfer_learning/datasets/train_merged_smiles.txt','w') as train_file:
+    with open('NPDL-GEN_Transfer_learning/datasets/train_merged_smiles.txt','w') as train_file:
         for smile in train_smiles:
             train_file.write(smile + '\n')
-    with open('NPDL-GEN&Transfer_learning/datasets/test_merged_smiles.txt', 'w') as test_file:
+    with open('NPDL-GEN_Transfer_learning/datasets/test_merged_smiles.txt', 'w') as test_file:
         for smile in test_smiles:
             test_file.write(smile + '\n')
             
     smiles = []
-    with open('NPDL-GEN&Transfer_learning/datasets/train_merged_smiles.txt', 'r') as train_file:
+    with open('NPDL-GEN_Transfer_learning/datasets/train_merged_smiles.txt', 'r') as train_file:
         for line in train_file:
             smiles.append(line.strip())
 
     vsmiles = []
-    with open('NPDL-GEN&Transfer_learning/datasets/test_merged_smiles.txt', 'r') as test_file:
+    with open('NPDL-GEN_Transfer_learning/datasets/test_merged_smiles.txt', 'r') as test_file:
         for line in test_file:
             vsmiles.append(line.strip())
 
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     tconf = TrainerConfig(max_epochs=args.max_epochs, batch_size=args.batch_size, learning_rate=args.learning_rate,
                             lr_decay=True, warmup_tokens=0.1*len(smiles)*max_len, 
                             final_tokens=args.max_epochs*len(smiles)*max_len, num_workers=5, 
-                            ckpt_path=f'NPDL-GEN&Transfer_learning/weights/{args.run_name}.pt', block_size=train_dataset.max_len, generate=True)
+                            ckpt_path=f'NPDL-GEN_Transfer_learning/weights/{args.run_name}.pt', block_size=train_dataset.max_len, generate=True)
     trainer = Trainer(model, train_dataset, valid_dataset,
                         tconf, train_dataset.stoi, train_dataset.itos)
     if hasattr(torch.cuda, 'empty_cache'):

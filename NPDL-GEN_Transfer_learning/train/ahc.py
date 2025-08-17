@@ -45,17 +45,17 @@ if __name__ == '__main__':
     set_seed(42)
     wandb.init(project="code_final", name=args.run_name)
     
-    with open('NPDL-GEN&Transfer_learning/datasets/merged_smiles_after.txt','r') as file:
+    with open('NPDL-GEN_Transfer_learning/datasets/merged_smiles_after.txt','r') as file:
         smiles_list = file.readlines()
     smiles_list = [smiles.strip() for smiles in smiles_list]
      
     smiles = []
-    with open('NPDL-GEN&Transfer_learning/datasets/train_merged_smiles.txt', 'r') as train_file:
+    with open('NPDL-GEN_Transfer_learning/datasets/train_merged_smiles.txt', 'r') as train_file:
         for line in train_file:
             smiles.append(line.strip())
 
     vsmiles = []
-    with open('NPDL-GEN&Transfer_learning/datasets/test_merged_smiles.txt', 'r') as test_file:
+    with open('NPDL-GEN_Transfer_learning/datasets/test_merged_smiles.txt', 'r') as test_file:
         for line in test_file:
             vsmiles.append(line.strip())
     
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     tconf = TrainerConfig(max_epochs=args.max_epochs, batch_size=args.batch_size, learning_rate=args.learning_rate,
                             lr_decay=True, warmup_tokens=0.1*len(smiles)*max_len, 
                             final_tokens=args.max_epochs*len(smiles)*max_len, num_workers=10, 
-                            ckpt_path=f'NPDL-GEN&Transfer_learning/weights/ahc-gpt1-diversity-400-topk-0.25.pt', block_size=train_dataset.max_len, generate=True)
+                            ckpt_path=f'NPDL-GEN_Transfer_learning/weights/ahc-gpt1-diversity-400-topk-0.25.pt', block_size=train_dataset.max_len, generate=True)
     trainer = Trainer(model, train_dataset, valid_dataset,
                         tconf, train_dataset.stoi, train_dataset.itos)
     if hasattr(torch.cuda, 'empty_cache'):
